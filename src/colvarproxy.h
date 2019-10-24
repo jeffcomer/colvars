@@ -48,11 +48,58 @@ public:
   /// Destructor
   virtual ~colvarproxy_system();
 
-  /// \brief Value of the unit for atomic coordinates with respect to
-  /// angstroms (used by some variables for hard-coded default values)
-  virtual cvm::real unit_angstrom() = 0;
+  // **********************************************************************
+  // TODO FIXME unsolved: calls to back-end PBC functions assume back-end length unit!
+  // We can use different unit from back-end in VMD bc using PBC functions from colvarproxy base class
+  // or test and default to internal PBC functions if we have our own units?
+  // Possible performance cost? a couple floating-point ops per coordinate
+  // **********************************************************************
 
-  /// \brief Boltzmann constant
+  // Colvars internal units are user specified, because the module exchanges info in unknown
+  // composite dimensions with user input, while it only exchanges quantities of known
+  // dimension with the back-end (length and forces)
+
+  /// \brief Describes the unit system. Set to that of the back-end at init time.
+  /// Supported: real (kcal/mol, A), metal (LAMMPS style), gromacs (kJ/mol, nm)
+  std::string units;
+
+  /// \brief Sets the system of units for the whole proxy
+  virtual int set_unit_system(std::string units) = 0;
+
+  /// \brief Value of 1 Angstrom in the internal (front-end) Colvars unit for atomic coordinates
+  /// * This defaults to the back-end unit
+  /// * can be user-specified once, and can only be changed by resetting the module
+  /// as user-defined values in composite units must be compatible with that system
+  /// Attempts to change it will raise errors
+  cvm::real angstrom_value;
+
+  /// \brief Value of 1 Angstrom in the backend's unit for atomic coordinates
+  virtual cvm::real backend_angstrom_value() = 0;
+
+  /// \brief Value of 1 kcal/mol in the internal Colvars unit for energy
+  cvm::real kcal_mol_value;
+
+  /// \brief Value of 1 kcal/mol in the backend's unit for energy
+  virtual cvm::real backend_kcal_mol_value() = 0;
+
+  /// \brief Convert a length from back-end unit to internal
+  inline cvm::real length_to_internal_unit(cvm::real l) {
+    if (angstrom_value == 0.) { return l; }
+    return l * angstrom_value / backend_angstrom_value();
+  }
+
+  // /// \brief Convert a force from internal unit to back-end
+  // inline cvm::real force_to_back_end_unit(cvm::real f) {
+  //   if (angstrom_value == 0. || kcal_mol_value == 0.) { return f; }
+  //   return f * kcal_mol_value * backend_angstrom_value() / (backend_kcal_mol_value() * angstrom_value);
+  // }
+
+  /// \brief Value of 1 kcal/mol in the backend's unit for energy
+  /// (force unit is assumed to derive from length and energy units)
+  // virtual cvm::real backend_kcal_mol_value() = 0;
+
+
+  /// \brief Boltzmann constant in internal Colvars units
   virtual cvm::real boltzmann() = 0;
 
   /// \brief Target temperature of the simulation (K units)

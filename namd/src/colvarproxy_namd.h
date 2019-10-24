@@ -79,6 +79,7 @@ public:
   void log(std::string const &message);
   void error(std::string const &message);
   void fatal_error(std::string const &message);
+  int set_unit_system(std::string units_in);
   void exit(std::string const &message);
   void add_energy(cvm::real energy);
   void request_total_force(bool yesno);
@@ -96,7 +97,12 @@ public:
                                    std::vector<const colvarvalue *> const &cvcs,
                                    std::vector<cvm::matrix2d<cvm::real> > &gradient);
 
-  cvm::real unit_angstrom()
+  cvm::real backend_angstrom_value()
+  {
+    return 1.0;
+  }
+
+  cvm::real backend_kcal_mol_value()
   {
     return 1.0;
   }

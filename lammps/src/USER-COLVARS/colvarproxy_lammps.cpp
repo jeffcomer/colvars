@@ -131,6 +131,8 @@ void colvarproxy_lammps::init(const char *conf_file)
            cvm::to_str(COLVARPROXY_VERSION)+".\n");
 
   my_angstrom  = _lmp->force->angstrom;
+  my_kcal_mol  = _lmp->force->qe2f / 23.060549;
+  // force->qe2f is 1eV expressed in LAMMPS' energy unit (1 if unit is eV, 23 if kcal/mol)
   my_boltzmann = _lmp->force->boltz;
   my_timestep  = _lmp->update->dt * _lmp->force->femtosecond;
 

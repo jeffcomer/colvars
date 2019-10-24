@@ -33,6 +33,7 @@
 
 
 colvarproxy_system::colvarproxy_system()
+  : angstrom_value(0.), kcal_mol_value(0.)
 {
   reset_pbc_lattice();
 }
@@ -132,8 +133,6 @@ cvm::rvector colvarproxy_system::position_distance(cvm::atom_pos const &pos1,
 
   return diff;
 }
-
-
 
 colvarproxy_atoms::colvarproxy_atoms()
 {
@@ -567,7 +566,7 @@ void colvarproxy_tcl::init_tcl_pointers()
 }
 
 
-char const *colvarproxy_tcl::tcl_obj_to_str(unsigned char * /* obj */)
+char const *colvarproxy_tcl::tcl_obj_to_str(unsigned char *obj)
 {
 #if defined(COLVARS_TCL)
   return Tcl_GetString(reinterpret_cast<Tcl_Obj *>(obj));
@@ -597,9 +596,9 @@ int colvarproxy_tcl::tcl_run_force_callback()
 
 
 int colvarproxy_tcl::tcl_run_colvar_callback(
-					     std::string const & /* name */,
-					     std::vector<const colvarvalue *> const & /* cvc_values */,
-					     colvarvalue & /* value */)
+					     std::string const & name,
+					     std::vector<const colvarvalue *> const & cvc_values,
+					     colvarvalue & value)
 {
 #if defined(COLVARS_TCL)
 
@@ -634,9 +633,9 @@ int colvarproxy_tcl::tcl_run_colvar_callback(
 
 
 int colvarproxy_tcl::tcl_run_colvar_gradient_callback(
-						      std::string const & /* name */,
-						      std::vector<const colvarvalue *> const & /* cvc_values */,
-						      std::vector<cvm::matrix2d<cvm::real> > & /* gradient */)
+						      std::string const & name,
+						      std::vector<const colvarvalue *> const & cvc_values,
+						      std::vector<cvm::matrix2d<cvm::real> > & gradient)
 {
 #if defined(COLVARS_TCL)
 
@@ -852,6 +851,9 @@ int colvarproxy::reset()
   int error_code = COLVARS_OK;
   error_code |= colvarproxy_atoms::reset();
   error_code |= colvarproxy_atom_groups::reset();
+  units.clear();
+  angstrom_value = 0.;
+  kcal_mol_value = 0.;
   return error_code;
 }
 

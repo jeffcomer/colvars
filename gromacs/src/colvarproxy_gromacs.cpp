@@ -206,13 +206,14 @@ void colvarproxy_gromacs::set_temper(double temper) {
   thermostat_temperature = temper;
 }
 
-// GROMACS uses nanometers.
-cvm::real colvarproxy_gromacs::unit_angstrom() { return 0.1; }
+// GROMACS uses nanometers and kJ/mol internally
+cvm::real colvarproxy_gromacs::backend_angstrom_value() { return 0.1; }
+cvm::real colvarproxy_gromacs::backend_kcal_mol_value() { return 4.184; }
 
 // From Gnu units
 // $ units -ts 'k' 'kJ/mol/K/avogadro'
-// 0.0083144621
-cvm::real colvarproxy_gromacs::boltzmann() { return 0.0083144621; }
+// 0.0083144599 with v2.16 (older value 0.0083144621)
+cvm::real colvarproxy_gromacs::boltzmann() { return 0.0083144599; }
 
 // Temperature of the simulation (K)
 cvm::real colvarproxy_gromacs::temperature() {

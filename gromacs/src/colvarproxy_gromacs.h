@@ -51,7 +51,8 @@ public:
   void add_energy (cvm::real energy);
 
   // **************** SYSTEM-WIDE PHYSICAL QUANTITIES ****************
-  cvm::real unit_angstrom();
+  cvm::real backend_angstrom_value();
+  cvm::real backend_kcal_mol_value();
   cvm::real boltzmann();
   cvm::real temperature();
   cvm::real dt();
